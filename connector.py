@@ -15,6 +15,7 @@ import requests
 
 drink_url = None
 money_log = None
+session = requests.Session()
 
 def init(money_log_name, api_key):
     """
@@ -22,7 +23,12 @@ def init(money_log_name, api_key):
     """
     global drink_url
     global money_log
-    drink_url = ('https://webdrink.csh.rit.edu/api/index.php?api_key=%s' % api_key) + "&request=%s"
+    global session
+    drink_url = 'https://drink.csh.rit.edu/'
+    session.headers = {
+        'X-Auth-Token': api_key
+        'Content-Type': 'application/json'
+    }
     money_log = money_log_name
 
 
@@ -51,15 +57,14 @@ def user_info(ibutton):
     """
     Gets the information about a user given their ibutton
     """
-    response = requests.get(drink_url % 'users/info' + "&ibutton=%s" % ibutton, verify=False)
+    response = session.get(drink_url % 'users/credits' + "&ibutton=%s" % ibutton)
     print(response.text)
     print(response.json)
     response = response.json()
     print("\niButton present. getting json\n")
     try:
-        return (response['data']['uid'],
-            int(response['data']['credits']),
-            response['data']['admin'] == '1')
+        return (response['user']['uid'],
+            int(response['user']['drinkBalance'])
     except Exception as e:
         print(e)
 
@@ -67,8 +72,8 @@ def increment_credits(uid, credits):
     """
     Updates the given user's drink credits and returns the user's new credits
     """
-    data = {'uid': uid, 'value': credits, 'type': 'add'}
-    response = requests.post(drink_url % 'users/credits', data = data, verify=False).json()
+    data = {'uid': uid, 'drinkBalance': credits}
+    response = requests.post(drink_url % 'users/credits', data = data).json()
     logging(str(response))
     try:
         with open(money_log, 'r') as f:

@@ -39,6 +39,7 @@ class CommThread(Thread):
     """
     def __init__(self, config_file_name):
         self.user_id = None
+        self.drink_credits = None
         self.config_file = config_file_name
         Thread.__init__(self)
         self.start()
@@ -51,11 +52,11 @@ class CommThread(Thread):
             it will be run in the main thread by the GUI thread.
         """
         try:
-            self.user_id, drink_credits, admin_status = connector.user_info(
+            self.user_id, self.drink_credits = connector.user_info(
                     self.current_ibutton)
             self.logged_in = True
             self.ser.write('a')
-            Publisher.sendMessage('updateNewUser', message=(self.user_id, drink_credits, admin_status))
+            Publisher.sendMessage('updateNewUser', message=(self.user_id, self.drink_credits))
         except Exception as e:
             connector.logging('Exception getting new user information', e = e)
             wx.CallAfter(self.append_log,
@@ -163,7 +164,7 @@ class CommThread(Thread):
             if datetime.now() - last_money_time > timedelta(seconds = 2) and money_cache:
                 connector.logging('money incr')
                 new_credits = connector.increment_credits(
-                        self.user_id, money_cache)
+                        self.user_id, self.drink_credits + money_cache)
                 wx.CallAfter(self.money_added, money_cache, new_credits)
                 money_cache = 0
 
