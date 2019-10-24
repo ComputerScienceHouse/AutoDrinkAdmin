@@ -26,7 +26,7 @@ def init(money_log_name, api_key):
     global session
     drink_url = 'https://drink.csh.rit.edu/'
     session.headers = {
-        'X-Auth-Token': api_key
+        'X-Auth-Token': api_key,
         'Content-Type': 'application/json'
     }
     money_log = money_log_name
@@ -63,7 +63,7 @@ def user_info(ibutton):
     response = response.json()
     print("\niButton present. getting json\n")
     try:
-        return (response['user']['uid'],
+        return (response['user']['uid'], \
             int(response['user']['drinkBalance'])
     except Exception as e:
         print(e)
