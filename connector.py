@@ -63,8 +63,7 @@ def user_info(ibutton):
     response = response.json()
     print("\niButton present. getting json\n")
     try:
-        return (response['user']['uid'], \
-            int(response['user']['drinkBalance'])
+        return (response['user']['uid'], int(response['user']['drinkBalance'])
     except Exception as e:
         print(e)
 
