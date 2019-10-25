@@ -54,9 +54,11 @@ class CommThread(Thread):
         try:
             self.user_id, self.drink_credits = connector.user_info(
                     self.current_ibutton)
+
+            print("User ID: {}\nCredits: {}".format(self.user_id, self.drink_credits))
             self.logged_in = True
             self.ser.write('a')
-            Publisher.sendMessage('updateNewUser', message=(self.user_id, self.drink_credits))
+            Publisher.sendMessage('updateNewUser', message=(self.user_id, self.drink_credits, False))
         except Exception as e:
             connector.logging('Exception getting new user information', e = e)
             wx.CallAfter(self.append_log,
@@ -165,6 +167,7 @@ class CommThread(Thread):
                 connector.logging('money incr')
                 new_credits = connector.increment_credits(
                         self.user_id, self.drink_credits + money_cache)
+                self.drink_credits = new_credits
                 wx.CallAfter(self.money_added, money_cache, new_credits)
                 money_cache = 0
 

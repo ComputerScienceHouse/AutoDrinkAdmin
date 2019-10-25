@@ -57,9 +57,13 @@ def user_info(ibutton):
     """
     Gets the information about a user given their ibutton
     """
-    response = session.get(drink_url % 'users/credits' + "&ibutton=%s" % ibutton)
+    print("Got iButton: {}".format(ibutton.rstrip()))
+    endpoint = drink_url + "users/credits"
+    params = {
+        "ibutton": ibutton.rstrip()
+    }
+    response = session.get(endpoint, params=params)
     print(response.text)
-    print(response.json)
     response = response.json()
     print("\niButton present. getting json\n")
     try:
@@ -72,7 +76,7 @@ def increment_credits(uid, credits):
     Updates the given user's drink credits and returns the user's new credits
     """
     data = {'uid': uid, 'drinkBalance': credits}
-    response = requests.post(drink_url % 'users/credits', data = data).json()
+    response = session.put(drink_url + 'users/credits', json=data).json()
     logging(str(response))
     try:
         with open(money_log, 'r') as f:
@@ -83,7 +87,7 @@ def increment_credits(uid, credits):
         logging(str(e))
         with open(money_log, 'w') as f:
             f.write(str(credits))
-    return int(response['data'])
+    return int(response['message'].split('credits to')[1].strip().split(' ')[0])
 
 def money_in_machine():
     try:

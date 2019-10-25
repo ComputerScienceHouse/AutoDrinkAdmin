@@ -2,3 +2,5 @@ config
 logs/*
 *.pyc
 test
+*.swp
+log.txt
